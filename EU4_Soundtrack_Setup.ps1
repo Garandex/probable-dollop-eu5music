@@ -10,7 +10,7 @@
     powershell -NoProfile -ExecutionPolicy Bypass -File "C:\path\EU4_Soundtrack_Setup.ps1" -LaunchCmd "%COMMAND%"
     
     Or self-updating from GitHub:
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr 'https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main/EU4_Soundtrack_Setup.ps1' -OutFile '$env:TEMP\eu4snd.ps1'; & '$env:TEMP\eu4snd.ps1' -LaunchCmd '%COMMAND%'"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr 'https://raw.githubusercontent.com/Garandex/probable-dollop-eu5music/main/EU4_Soundtrack_Setup.ps1' -OutFile '$env:TEMP\eu4snd.ps1'; & '$env:TEMP\eu4snd.ps1' -LaunchCmd '%COMMAND%'"
 #>
 
 param([string]$LaunchCmd = "")
@@ -63,7 +63,7 @@ $MediaDir  = "$BanksDir\Media"
 $TmpDir    = "$env:TEMP\eu4snd_v2"
 $CacheDll  = "$env:TEMP\eu4wem_cache\OggToWem_v3.dll"
 $PcbPath   = "$env:TEMP\eu4wem_cache\packed_codebooks.bin"
-$GitHubRaw = "https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main"
+$GitHubRaw = "https://raw.githubusercontent.com/Garandex/probable-dollop-eu5music/main"
 
 # --- COMPILE OGG->WEM CONVERTER (once, cached as DLL) ------
 if (-not (Test-Path $CacheDll)) {
