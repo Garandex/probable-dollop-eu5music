@@ -1,0 +1,133 @@
+Brings the music of Europa Universalis IV into EU5 — fully integrated into the game's dynamic music engine. War, peace, and cultural context all trigger the right tracks automatically, just like in the original games.
+
+[hr]
+
+[h2]What it does[/h2]
+
+[b]179 tracks[/b] from EU4 and its music DLCs are woven into EU5's adaptive music system:
+
+[list]
+[*][b]At war[/b] — EU4 war tracks play alongside EU5 music
+[*][b]At peace[/b] — EU4 ambient and atmospheric tracks
+[*][b]Cultural context[/b] — regional EU4 music matches your nation's culture group:
+[list]
+[*]European nations hear British, French, HRE, Scandinavian, Russian, Iberian tracks
+[*]Ottoman/Persian/Egyptian/Caucasian → Middle Eastern tracks
+[*]Chinese/Japanese/SEA → East Asian tracks
+[*]Indian, African, American nations get their own regional tracks
+[/list]
+[/list]
+
+[quote]EU4 track names won't appear in the Music Player list. The music plays automatically in the background based on game state — you'll just hear it change. You can still skip to the next track using the [b]Next[/b] button in the Music Player. This is intentional to keep the mod multiplayer-compatible (no checksum change).[/quote]
+
+[hr]
+
+[h2]Requirements — read before installing[/h2]
+
+[b]1. Europa Universalis IV[/b] must be installed on the same Steam account.
+The mod reads audio files directly from your EU4 folder — it does not download or redistribute any music.
+Only tracks from DLCs you own will be included.
+
+[strike][b]2. Wwise Authoring Tools 2026.x[/b] (free)
+Required to convert EU4 audio to EU5-compatible format (WEM).[/strike]
+[i]No longer required — the setup script handles conversion automatically.[/i]
+
+[b]3. FFmpeg[/b]
+Audio conversion tool. Install via terminal:
+[code]winget install ffmpeg[/code]
+Or download from [url=https://ffmpeg.org]ffmpeg.org[/url] and add to PATH.
+
+[hr]
+
+[h2]Installation[/h2]
+
+[b]Step 1.[/b] Make sure requirements 1 and 3 above are installed.
+
+[b]Step 2.[/b] In Steam → right-click EU5 → Properties → [b]Launch Options[/b], paste:
+
+[code]cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"[/code]
+
+[b]Step 3.[/b] Launch EU5. A setup window will appear and convert all EU4 tracks (~2–5 minutes). The game starts automatically when done.
+
+[b]Step 4.[/b] Once in the game, open the mods menu → enable [b]EU4 Soundtrack for EU5[/b] → restart the game.
+
+After the initial conversion the launch command and FFmpeg are no longer required — the mod works without them. You can uninstall them, or keep them if you want the setup to automatically sync any new EU4 tracks added to your game folder.
+
+[hr]
+
+[h2]How the music works[/h2]
+
+EU5 uses Wwise for its entire audio system. This mod patches the Wwise sound banks at the binary level — adding EU4 track references into EU5's existing WAR, PEACE, and cultural playlists. No EU5 tracks are replaced or removed.
+
+[list]
+[*][b]WAR[/b] — +146 EU4 tracks (player at war)
+[*][b]PEACE[/b] — +135 EU4 tracks (player at peace)
+[*][b]European culture[/b] — +43 tracks
+[*][b]Middle Eastern culture[/b] (Ottoman/Persian/etc.) — +19 tracks
+[*][b]East Asian culture[/b] (Chinese/Japanese/etc.) — +15 tracks
+[*][b]Indian culture[/b] — +5 tracks
+[*][b]African culture[/b] — +4 tracks
+[*][b]North American culture[/b] — +4 tracks
+[*][b]South American culture[/b] — +1 track
+[/list]
+
+Neutral and discovery tracks appear in both WAR and PEACE playlists, so they play regardless of war state.
+
+Regional tracks (British, Ottoman, East Asian, etc.) are added to both the WAR/PEACE playlists and their matching cultural playlist — so they play roughly twice as often as neutral tracks for nations of that culture.
+
+[hr]
+
+[h2]Included DLCs[/h2]
+
+Tracks from any of these DLCs you own will be automatically included:
+
+Base Game · Songs of the New World · Republican Music · Songs of War · Guns Drums & Steel Vol. 1–3 · Songs of Exploration · Kairis Soundtrack Parts 1–3 · Songs of Regency · Rule Britannia · Dharma · Golden Century · Emperor · North America · South-East Asia · West Africa · East Africa · Scandinavia · Baltics · Ottoman · Chinese · French · Egyptian · Persian · Caucasian · Utopia HRE · 10th Anniversary · The Rus Awaken · Kairis Ottoman Tunes · Native America · Central Asia · Central Europe
+
+[b]Not included:[/b] Sabaton Soundtrack, Fredman's Epistles — these contain third-party licensed music and cannot be redistributed or converted.
+
+[hr]
+
+[h2]Troubleshooting[/h2]
+
+[b]"FFmpeg not found"[/b] — Run [code]winget install ffmpeg[/code] in PowerShell, then restart Steam
+
+[b]"EU4 not found"[/b] — The script finds EU4 automatically through your Steam library. Make sure EU4 is installed on the same Steam account and that Steam is installed.
+
+[b]"packed_codebooks.bin download failed"[/b] — Check your internet connection. The file (~74 KB) is downloaded automatically on first run from github.com/hcs64/ww2ogg
+
+[b]Only a brief sound then silence[/b] — Delete all [code].wem[/code] files from the mod's [code]Media\[/code] folder and re-run the setup script to rebuild the media cache.
+
+[b]Music not playing[/b] — Make sure the mod is enabled and the game was restarted after enabling it
+
+[hr]
+
+[h2]Update notes[/h2]
+
+After a mod update it is recommended to re-run the setup script once to ensure full compatibility — the script will only convert new tracks and skip everything already done.
+
+[h3]Changelog[/h3]
+
+[b]v1.2[/b] — 179 tracks
+[list]
+[*]Added 24 previously missing tracks: Republican Music (2), Songs of War (2), Guns Drums & Steel Vol. 1–2 (5), Songs of Exploration (2), Kairis Soundtrack (2), Songs of Regency (2), Egyptian (2), Persian (2), Caucasian (2), Native America (1), Central Asia (1), Central Europe (1)
+[/list]
+
+[b]v1.1[/b] — 155 tracks, no Wwise
+[list]
+[*]Wwise Authoring no longer required — setup script now handles full conversion automatically
+[*]Required tools (oggenc2, packed_codebooks) downloaded automatically on first run
+[*]Only FFmpeg needed
+[/list]
+
+[b]v1.0[/b] — 155 tracks
+[list]
+[*]Initial release — required Wwise Authoring + FFmpeg + setup script
+[/list]
+
+[hr]
+
+[h2]Legal[/h2]
+
+This mod converts audio from your own legally-owned EU4 installation. No copyrighted audio files are included or distributed. Requires valid copies of EU4 and any DLCs you want to include.
+
+[url=https://github.com/komoreb11/eu5-music-converter]Source on GitHub[/url]
