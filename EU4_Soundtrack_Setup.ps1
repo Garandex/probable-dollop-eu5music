@@ -962,7 +962,7 @@ foreach ($track in $Tracks) {
         
         # Build the sb_music_logic entry (Tab Separated values)
         # Format: Event [TAB] WemID [TAB] EventName [TAB] VirtualPath
-        $LogicContent += "Event`t$wemId`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
+        $LogicContent += "`t$wemId`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
