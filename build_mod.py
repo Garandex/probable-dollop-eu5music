@@ -281,6 +281,27 @@ TRACKS = [
     EU4Track("MusicPlayer_eu4_ce_austria_theme","music/austria_theme.ogg","dlc140_central_europe_music_pack","neutral","central_european"),
     EU4Track("MusicPlayer_eu4_ce_hungary_theme","music/hungary_theme.ogg","dlc140_central_europe_music_pack","neutral","central_european"),
     EU4Track("MusicPlayer_eu4_ce_netherlands_theme","music/netherlands_theme.ogg","dlc140_central_europe_music_pack","neutral","central_european"),
+    # DLC 052
+    EU4Track("MusicPlayer_eu4_sab_euivss_thelionfromthenorth","music/euivss_thelionfromthenorth.ogg","dlc052_sabaton_soundtrack","war",None),
+    EU4Track("MusicPlayer_eu4_sab_euivss_thecaroleansprayer","music/euivss_thecaroleansprayer.ogg","dlc052_sabaton_soundtrack","war",None),
+    EU4Track("MusicPlayer_eu4_sab_euivss_theartofwar","music/euivss_theartofwar.ogg","dlc052_sabaton_soundtrack","war",None),
+    EU4Track("MusicPlayer_eu4_sab_euivss_sabatoncarolusrexenglish","music/euivss_sabatoncarolusrexenglish.ogg","dlc052_sabaton_soundtrack","war",None),
+    EU4Track("MusicPlayer_eu4_sab_euivss_alifetimeofwar","music/euivss_alifetimeofwar.ogg","dlc052_sabaton_soundtrack","war",None),
+    # DLC 064
+    EU4Track("MusicPlayer_eu4_frep_frepmp_aldrig_en_iris","music/frepmp_aldrig_en_iris.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_drick_ur_ditt_glas","music/frepmp_drick_ur_ditt_glas.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_glimmande_nymf","music/frepmp_glimmande_nymf.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_grat_fader_berg_och_spela","music/frepmp_grat_fader_berg_och_spela.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_gubbarna_satt_sig_att_dricka","music/frepmp_gubbarna_satt_sig_att_dricka.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_kare_broder_i_frid","music/frepmp_kare_broder_sa_latom_oss_supa_i_frid.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_mark_hur_var_skugga","music/frepmp_mark_hur_var_skugga.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_movitz_ta_dina_pinnar","music/frepmp_movitz_ta_dina_pinnar.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_se_hvad_movitz_sitter_dar","music/frepmp_se_hvad_movitz_sitter_dar.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_se_hvi_grater","music/frepmp_se_movitz_hvi_star_du_och_grater.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_solen_glimmar","music/frepmp_solen_glimmar.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_trad_fram_du_nattens_gud","music/frepmp_trad_fram_du_nattens_gud.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_varm_mer_ol_och_brod","music/frepmp_varm_mer_ol_och_brod.ogg","dlc064_fredmans_epistles","neutral",None),
+    EU4Track("MusicPlayer_eu4_frep_frepmp_vila_vid_denna_kalla","music/frepmp_vila_vid_denna_kalla.ogg","dlc064_fredmans_epistles","neutral",None),
 ]
 
 # ─── WWISE BINARY HELPERS ───────────────────────────────────────────────────
