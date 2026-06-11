@@ -38,7 +38,7 @@ No Wwise, no Python.
 **Step 2.** Add to EU5 **Launch Options** in Steam:
 
 ```
-cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"
+cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/Garandex/probable-dollop-eu5music/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"
 ```
 
 **Step 3.** Launch EU5 → setup window converts all tracks (~2–5 min) → game starts.
