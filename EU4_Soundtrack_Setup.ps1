@@ -917,7 +917,7 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK DATA -------------
 Write-Status "Generating EU5 Music Player configurations..."
 
-# Define our mod file paths
+# Define our mod file paths using existing $ModDir and $MediaDir
 $MusicPlayerDir = "$ModDir\in_game\common\music_player_tracks"
 $LocDir         = "$ModDir\main_menu\localization\music_player_gui"
 
@@ -949,18 +949,21 @@ foreach ($track in $Tracks) {
         # Build the metadata registry entry
         $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
         
-        # Build the localization lines
-        $LocContent += "  $eventName: `"$CleanName`"`n"
-        $LocContent += "  $eventName`_flavour: `"Classic track imported from Europa Universalis IV.`"`n"
+        # FIX: Using single quotes wrapping double quotes to completely bypass backtick issues,
+        # and making absolutely sure these are standard 0x20 spaces.
+        $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
+        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`n"
         
         $TotalRegistered++
     }
 }
 
-# 3. Write out the completed text files (using standard UTF-8 for paradox compatibility)
+# 3. Write out the completed text files
 [System.IO.File]::WriteAllText($TrackRegistryFile, $RegistryContent, [System.Text.Encoding]::UTF8)
-# Note: Paradox games often require UTF-8 with BOM or strict UTF-8 for localization files
-[System.IO.File]::WriteAllText($LocalizationFile, $LocContent, (New-Object System.Text.EncodingProvider).GetEncoding("utf-8"))
+
+# Paradox localization strictly requires UTF-8 with BOM or a distinct signature to read characters cleanly
+$Utf8Bom = New-Object System.Text.UTF8Encoding $true
+[System.IO.File]::WriteAllText($LocalizationFile, $LocContent, $Utf8Bom)
 
 Write-Ok "Registered $TotalRegistered tracks into the EU5 Music Player successfully!"
 # -----------------------------------------------------------
