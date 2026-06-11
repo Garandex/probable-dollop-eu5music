@@ -595,6 +595,17 @@ function Write-Ok($msg)     { Write-Host "[OK] $msg" -ForegroundColor Green }
 function Write-Warn($msg)   { Write-Host "[!]  $msg" -ForegroundColor Yellow }
 function Write-Err($msg)    { Write-Host "[X]  $msg" -ForegroundColor Red }
 
+#NEW FUNCTION
+function Get-CleanTrackName([string]$EventName) {
+    # Remove the 'MusicPlayer_eu4_' prefix
+    $raw = $EventName -replace "^MusicPlayer_eu4_", ""
+    # Replace underscores with spaces
+    $cleaned = $raw -replace "_", " "
+    # Capitalize the first letter of each word
+    $textInfo = (Get-Culture).TextInfo
+    return $textInfo.ToTitleCase($cleaned)
+}
+
 function Get-WemId([string]$EventName) {
     [uint64]$h = 2166136261
     [uint64]$mask = 4294967295
@@ -903,6 +914,56 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
     }
 }
 
+# --- NEW: GENERATE EU5 MUSIC PLAYER TRACK DATA -------------
+Write-Status "Generating EU5 Music Player configurations..."
+
+# Define our mod file paths
+$MusicPlayerDir = "$ModDir\in_game\common\music_player_tracks"
+$LocDir         = "$ModDir\main_menu\localization\music_player_gui"
+
+# Ensure the directories exist in our mod folder
+New-Item -ItemType Directory -Force $MusicPlayerDir | Out-Null
+New-Item -ItemType Directory -Force $LocDir | Out-Null
+
+$TrackRegistryFile = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
+$LocalizationFile  = "$LocDir\eu4_music_l_english.yml"
+
+# 1. Initialize our files with headers
+$RegistryContent = "# Automated EU4 Imported Tracks Configuration`n"
+$LocContent      = "l_english:`n"
+
+# 2. Iterate over the track array to map existing files
+$TotalRegistered = 0
+
+foreach ($track in $Tracks) {
+    if ($null -eq $track -or $track -notmatch "\|") { continue }
+    $parts = $track -split "\|"
+    $eventName = $parts[0]
+    $wemId     = Get-WemId $eventName
+    $wemPath   = "$MediaDir\$wemId.wem"
+
+    # Only register tracks if the user actually owns/has converted the WEM audio file!
+    if (Test-Path $wemPath) {
+        $CleanName = Get-CleanTrackName $eventName
+        
+        # Build the metadata registry entry
+        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
+        
+        # Build the localization lines
+        $LocContent += "  $eventName: `"$CleanName`"`n"
+        $LocContent += "  $eventName`_flavour: `"Classic track imported from Europa Universalis IV.`"`n"
+        
+        $TotalRegistered++
+    }
+}
+
+# 3. Write out the completed text files (using standard UTF-8 for paradox compatibility)
+[System.IO.File]::WriteAllText($TrackRegistryFile, $RegistryContent, [System.Text.Encoding]::UTF8)
+# Note: Paradox games often require UTF-8 with BOM or strict UTF-8 for localization files
+[System.IO.File]::WriteAllText($LocalizationFile, $LocContent, (New-Object System.Text.EncodingProvider).GetEncoding("utf-8"))
+
+Write-Ok "Registered $TotalRegistered tracks into the EU5 Music Player successfully!"
+# -----------------------------------------------------------
 # Done - game launched by launch.cmd via %*
 Write-Host ""
 Write-Status "Setup complete. Game starting..."
