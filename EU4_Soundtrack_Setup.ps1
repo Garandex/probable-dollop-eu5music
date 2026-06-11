@@ -951,7 +951,7 @@ foreach ($track in $Tracks) {
     # Only map tracks if the audio file exists
     if (Test-Path $wemPath) {
         # Grab your beautiful hardcoded title from the 4th array position (Index 3)
-        $CleanName = $parts[3]
+        $CleanName = Get-CleanTrackName $eventName
         
         # Build the metadata registry entry
         $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
