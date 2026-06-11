@@ -1,5 +1,5 @@
 $EU5_APPID = "3450310"
-$LAUNCH_CMD = 'cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/komoreb11/eu5-music-converter/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"'
+$LAUNCH_CMD = 'cmd /c "curl -sL -o %TEMP%\eu4launch.cmd https://raw.githubusercontent.com/Garandex/probable-dollop-eu5music/main/launch.cmd & call %TEMP%\eu4launch.cmd %command%"'
 
 function Set-SteamLaunchOption {
     param([string]$AppId, [string]$Command)
