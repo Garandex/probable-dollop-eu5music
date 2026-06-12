@@ -960,6 +960,17 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
+# Simple function to compute standard Wwise FNV-1a 32-bit hashes for Event Names
+function Get-WwiseHash([string]$String) {
+    $hash = 2166136261
+    $bytes = [System.Text.Encoding]::ASCII.GetBytes($String.ToLower())
+    foreach ($b in $bytes) {
+        $hash = $hash -bxor $b
+        $hash = ($hash * 16777619) -band 0xFFFFFFFF
+    }
+    return $hash
+}
+
 # Define our mod file paths
 $MusicPlayerDir = "$ModDir\in_game\common\music_player_tracks"
 $LocDir         = "$ModDir\main_menu\localization\music_player_gui"
@@ -970,10 +981,10 @@ New-Item -ItemType Directory -Force $MusicPlayerDir | Out-Null
 New-Item -ItemType Directory -Force $LocDir | Out-Null
 New-Item -ItemType Directory -Force $SoundLogicDir | Out-Null
 
-$TrackRegistryFile   = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
-$LocalizationFile    = "$LocDir\eu4_music_l_english.yml"
+$TrackRegistryFile = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
+$LocalizationFile  = "$LocDir\eu4_music_l_english.yml"
 $LocalizationDefFile = "$LocDir\eu4_music_defines_l_english.yml"
-$MusicLogicFile      = "$SoundLogicDir\sb_music_logic.txt"
+$MusicLogicFile    = "$SoundLogicDir\sb_music_logic.txt"
 
 # 1. Initialize our files with headers
 $RegistryContent = "# Automated EU4 Imported Tracks Configuration`n"
@@ -982,7 +993,7 @@ $LocDefContent   = 'l_english:`n  EU4_Composer: "EU4 Theme"' + "`n"
 # Initialize a hash table to store unique DLCs
 $DlcMap = @{}
 
-# For sb_music_logic.txt, we must respect the standard Wwise tab-separated header format
+# The header for sb_music_logic.txt
 $LogicContent    = "Event`tID`tName`tWwise Object Path`n"
 
 # 2. Iterate over the track array to map existing files
@@ -996,8 +1007,8 @@ foreach ($track in $Tracks) {
     $wemPath   = "$MediaDir\$wemId.wem"
     #Now extract DLC for localisation
     $dlcName   = $parts[2]
-
-    # Only map tracks if the audio file exists
+	
+    # Only map tracks if the physical audio file exists
     if (Test-Path $wemPath) {
         # Grab your beautiful hardcoded title from the 1st array position (Index 0)
         $CleanName = Get-CleanTrackName $eventName
@@ -1007,7 +1018,7 @@ foreach ($track in $Tracks) {
         $CleanDLCID = Get-CleanDLCID $dlcName
         
         # Build the metadata registry entry
-        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = EU4DLC_$CleanDLCID`n}`n"
+        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
@@ -1031,9 +1042,11 @@ foreach ($track in $Tracks) {
         # This automatically handles duplicates (the last one wins).
         $DlcMap[$CleanDLCID] = $CleanDLCName
         
-        # Build the sb_music_logic entry (Tab Separated values)
-        # Format: Event [TAB] WemID [TAB] EventName [TAB] VirtualPath
-        $LogicContent += "`t$wemId`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
+        # FIX: Calculate the true Wwise Event Hash from the string name, NOT the .wem ID
+        $EventHash = Get-WwiseHash $eventName
+        
+        # Build the sb_music_logic entry mapping the true Event ID back to the string name
+        $LogicContent += "Event`t$EventHash`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
@@ -1060,13 +1073,12 @@ foreach ($Key in $SortedKeys) {
 # 3. Write out the completed text files using proper encodings
 [System.IO.File]::WriteAllText($TrackRegistryFile, $RegistryContent, [System.Text.Encoding]::UTF8)
 
-# UTF-8 with BOM for Paradox Localization & Logic Engines
+# UTF-8 with BOM for Paradox Engines
 $Utf8Bom = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText($LocalizationFile, $LocContent, $Utf8Bom)
-[System.IO.File]::WriteAllText($LocalizationDefFile, $LocDefContent, $Utf8Bom)
 [System.IO.File]::WriteAllText($MusicLogicFile, $LogicContent, $Utf8Bom)
 
-Write-Ok "Registered $TotalRegistered tracks and mapped Wwise logic successfully!"
+Write-Ok "Registered $TotalRegistered tracks and mapped Wwise Event Hashes successfully!"
 # -----------------------------------------------------------
 # Done - game launched by launch.cmd via %*
 Write-Host ""
