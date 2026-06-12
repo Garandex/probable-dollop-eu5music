@@ -960,19 +960,21 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
-# Simple function to compute standard Wwise FNV-1 32-bit hashes using safe native math
 function Get-WwiseHash([string]$String) {
-    # Force unsigned 32-bit types using .NET structures to prevent overflow crashes
-    [uint32]$hash = 2166136261
-    [uint32]$prime = 16777619
+    # Initialize using native 64-bit integers to hold the massive numbers during calculation
+    [uint64]$hash = 2166136261
+    [uint64]$prime = 16777619
     
     $bytes = [System.Text.Encoding]::ASCII.GetBytes($String.ToLower())
     foreach ($b in $bytes) {
-        # Using [unchecked] math operations ensures overflows wrap around naturally without errors
-        $hash = [unchecked]($hash -bxor $b)
-        $hash = [unchecked]($hash * $prime)
+        $hash = $hash -bxor $b
+        $hash = $hash * $prime
+        
+        # This is the magic bitmask: It mimics a 32-bit rollover overflow 
+        # by instantly discarding any bits that exceed the 32-bit boundary.
+        $hash = $hash -band 0xFFFFFFFF
     }
-    return $hash
+    return [uint32]$hash
 }
 
 # Define our mod file paths
