@@ -1006,7 +1006,7 @@ foreach ($track in $Tracks) {
         $displayName = $CleanDLCName
         
         # 2. Add "the" if it isn't already there (only if it's NOT the main game)
-        if ($CleanDLCID -ne "eu4_main" -and $displayName -notlike "the *") {
+        if ($displayName -notlike "the *") {
             $displayName = "the $displayName"
         }
         
