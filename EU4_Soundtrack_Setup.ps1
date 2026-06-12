@@ -621,7 +621,8 @@ function Get-CleanDLCName([string]$EventName) {
     $textInfo = (Get-Culture).TextInfo
     if ($EventName = "10Th Anniversary") {
         return "10th Anniversary Community Music Pack"
-    } elseif ($EventName = "Republican Music") {
+    }
+    if ($EventName = "Republican Music") {
         return "Republican Music Pack"
     }
     return $textInfo.ToTitleCase($cleaned)
