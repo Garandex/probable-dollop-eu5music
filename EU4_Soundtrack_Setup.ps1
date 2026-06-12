@@ -1030,7 +1030,7 @@ foreach ($track in $Tracks) {
         $CleanDLCID = Get-CleanDLCID $dlcName
         
         # Build the metadata registry entry
-        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
+        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = EU4DLC_$CleanDLCID`n}`n"
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
