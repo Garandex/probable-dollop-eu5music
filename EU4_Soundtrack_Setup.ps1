@@ -1003,20 +1003,19 @@ foreach ($track in $Tracks) {
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
 
         # logic for dealing with DLC names
-        # Determine the display name based on whether it starts with "the"
-        if ($CleanDLCName -like "the *") {
-            $displayName = $CleanDLCName
-        } else {
-            $displayName = "the $CleanDLCName"
+        $displayName = $CleanDLCName
+        
+        # 2. Add "the" if it isn't already there (only if it's NOT the main game)
+        if ($CleanDLCID -ne "eu4_main" -and $displayName -notlike "the *") {
+            $displayName = "the $displayName"
         }
         
-        # Apply the specific exception for eu4_main
-        if ($CleanDLCID -eq "eu4_main") {
-            $displayName = $CleanDLCName
-        } else {
-            $displayName = "$CleanDLCName DLC"
+        # 3. Add " DLC" suffix, unless it's the main game
+        if ($CleanDLCID -ne "eu4_main") {
+            $displayName += " DLC"
         }
-        # Append to the LocContent string
+        
+        # 4. Append to the LocContent string
         $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV. This track was used in ' + $displayName + '."' + "`n"
         
         # This automatically handles duplicates (the last one wins).
