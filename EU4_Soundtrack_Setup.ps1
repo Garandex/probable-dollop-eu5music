@@ -1027,7 +1027,9 @@ if ($DlcMap.ContainsKey("eu4_main")) {
 $SortedKeys = $DlcMap.Keys | Where-Object { $_ -ne "eu4_main" } | Sort-Object
 
 foreach ($Key in $SortedKeys) {
-    $LocDefContent += "  EU4DLC_$Key: `"$($DlcMap[$Key])`"`n"
+    # {0} is the key, {1} is the value
+    # The '""' inside the string ensures the output file has actual " quotes
+    $LocDefContent += '  EU4DLC_{0}: "{1}"' -f $Key, $DlcMap[$Key] + "`n"
 }
 # ------------------------------------------
 
