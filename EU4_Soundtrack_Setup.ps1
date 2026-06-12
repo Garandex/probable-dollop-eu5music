@@ -619,10 +619,10 @@ function Get-CleanDLCName([string]$EventName) {
     
     # Capitalize the first letter of each word
     $textInfo = (Get-Culture).TextInfo
-    if ($EventName = "10Th Anniversary") {
+    if ($EventName -eq "10Th Anniversary") {
         return "10th Anniversary Community Music Pack"
     }
-    if ($EventName = "Republican Music") {
+    if ($EventName -eq "Republican Music") {
         return "Republican Music Pack"
     }
     return $textInfo.ToTitleCase($cleaned)
