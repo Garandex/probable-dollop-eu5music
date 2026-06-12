@@ -990,15 +990,11 @@ New-Item -ItemType Directory -Force $SoundLogicDir | Out-Null
 
 $TrackRegistryFile = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
 $LocalizationFile  = "$LocDir\eu4_music_l_english.yml"
-$LocalizationDefFile = "$LocDir\eu4_music_defines_l_english.yml"
 $MusicLogicFile    = "$SoundLogicDir\sb_music_logic.txt"
 
 # 1. Initialize our files with headers
 $RegistryContent = "# Automated EU4 Imported Tracks Configuration`n"
 $LocContent      = "l_english:`n"
-$LocDefContent   = 'l_english:`n  EU4_Composer: "EU4 Theme"' + "`n"
-# Initialize a hash table to store unique DLCs
-$DlcMap = @{}
 
 # The header for sb_music_logic.txt
 $LogicContent    = "Event`tID`tName`tWwise Object Path`n"
@@ -1012,70 +1008,28 @@ foreach ($track in $Tracks) {
     $eventName = $parts[0]
     $wemId     = Get-WemId $eventName
     $wemPath   = "$MediaDir\$wemId.wem"
-    #Now extract DLC for localisation
-    $dlcName   = $parts[2]
-	
+
     # Only map tracks if the physical audio file exists
     if (Test-Path $wemPath) {
-        # Grab your beautiful hardcoded title from the 1st array position (Index 0)
+        # Using your reverted procedural clean name logic
         $CleanName = Get-CleanTrackName $eventName
-        # Grab your beautiful hardcoded DLC from the 3rd array position (Index 2)
-        $CleanDLCName = Get-CleanDLCName $dlcName
-        # Grab your beautiful hardcoded DLC ID from the 3rd array position (Index 2)
-        $CleanDLCID = Get-CleanDLCID $dlcName
         
         # Build the metadata registry entry
         $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
-
-        # logic for dealing with DLC names
-        $displayName = $CleanDLCName
+        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`n"
         
-        # 2. Add "the" if it doesn't already have it
-        if ($displayName -notlike "the *") {
-            $displayName = "the $displayName"
-        }
-        
-        # 3. Add " DLC" suffix ONLY if it is not the main game
-        if ($CleanDLCID -ne "eu4_main") {
-            $displayName += " DLC"
-        }
-        
-        # 4. Append to the LocContent string
-        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV. This track was used in ' + $displayName + '."' + "`n"
-        
-        # This automatically handles duplicates (the last one wins).
-        $DlcMap[$CleanDLCID] = $CleanDLCName
-        
-        # FIX: Calculate the true Wwise Event Hash from the string name, NOT the .wem ID
+        # Calculate the true Wwise Event Hash from the string name using the fixed function
         $EventHash = Get-WwiseHash $eventName
         
         # Build the sb_music_logic entry mapping the true Event ID back to the string name
-        $LogicContent += "`t$EventHash`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
+        $LogicContent += "Event`t$EventHash`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
 }
-
-# Build the sorted localization file-------
-$LocDefContent = "l_english:`n  EU4_Composer: `"EU4 Theme`"`n"
-
-# A. Handle eu4_main first if it exists
-if ($DlcMap.ContainsKey("eu4_main")) {
-    $LocDefContent += "  EU4DLC_eu4_main: `"$($DlcMap["eu4_main"])`"`n"
-}
-
-# B. Sort the remaining keys and add them
-$SortedKeys = $DlcMap.Keys | Where-Object { $_ -ne "eu4_main" } | Sort-Object
-
-foreach ($Key in $SortedKeys) {
-    # {0} is the key, {1} is the value
-    # The '""' inside the string ensures the output file has actual " quotes
-    $LocDefContent += '  EU4DLC_{0}: "{1}"' -f $Key, $DlcMap[$Key] + "`n"
-}
-# ------------------------------------------
 
 # 3. Write out the completed text files using proper encodings
 [System.IO.File]::WriteAllText($TrackRegistryFile, $RegistryContent, [System.Text.Encoding]::UTF8)
@@ -1083,7 +1037,6 @@ foreach ($Key in $SortedKeys) {
 # UTF-8 with BOM for Paradox Engines
 $Utf8Bom = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText($LocalizationFile, $LocContent, $Utf8Bom)
-[System.IO.File]::WriteAllText($LocalizationDefFile, $LocDefContent, $Utf8Bom)
 [System.IO.File]::WriteAllText($MusicLogicFile, $LogicContent, $Utf8Bom)
 
 Write-Ok "Registered $TotalRegistered tracks and mapped Wwise Event Hashes successfully!"
