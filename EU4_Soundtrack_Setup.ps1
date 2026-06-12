@@ -960,6 +960,7 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
+# Simple function to compute standard Wwise FNV-1 32-bit hashes using safe native math
 function Get-WwiseHash([string]$String) {
     # Initialize using native 64-bit integers to hold the massive numbers during calculation
     [uint64]$hash = 2166136261
