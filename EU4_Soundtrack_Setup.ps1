@@ -1076,6 +1076,7 @@ foreach ($Key in $SortedKeys) {
 # UTF-8 with BOM for Paradox Engines
 $Utf8Bom = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText($LocalizationFile, $LocContent, $Utf8Bom)
+[System.IO.File]::WriteAllText($LocalizationDefFile, $LocDefContent, $Utf8Bom)
 [System.IO.File]::WriteAllText($MusicLogicFile, $LogicContent, $Utf8Bom)
 
 Write-Ok "Registered $TotalRegistered tracks and mapped Wwise Event Hashes successfully!"
