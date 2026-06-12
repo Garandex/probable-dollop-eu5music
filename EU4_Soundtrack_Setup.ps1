@@ -1055,10 +1055,10 @@ foreach ($track in $Tracks) {
         $DlcMap[$CleanDLCID] = $CleanDLCName
         
         # FIX: Call the compiler layer helper directly here, bypassing the faulty math engine completely
-        $EventHash = [WwiseHasher]::Calculate($eventName)
+        # $EventHash = [WwiseHasher]::Calculate($eventName)
         
         # Build the sb_music_logic entry mapping the true Event ID back to the string name
-        $LogicContent += "`t$EventHash`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
+        $LogicContent += "`t$wemId`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
