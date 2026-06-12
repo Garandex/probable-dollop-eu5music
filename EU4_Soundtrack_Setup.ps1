@@ -992,7 +992,7 @@ New-Item -ItemType Directory -Force $MusicPlayerDir | Out-Null
 New-Item -ItemType Directory -Force $LocDir | Out-Null
 New-Item -ItemType Directory -Force $SoundLogicDir | Out-Null
 
-$TrackRegistryFile = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
+$TrackRegistryFile = "$MusicPlayerDir\01_music_player_tracks.txt"
 $LocalizationFile  = "$LocDir\eu4_music_l_english.yml"
 $LocalizationDefFile = "$LocDir\eu4_music_defines_l_english.yml"
 
@@ -1030,7 +1030,7 @@ foreach ($track in $Tracks) {
         $CleanDLCID = Get-CleanDLCID $dlcName
         
         # Build the metadata registry entry
-        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = EU4DLC_$CleanDLCID`n}`n"
+        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = EU4DLC_$CleanDLCID`n`tmusic = " + '"' + "$eventName" + '"' + "`n`tsoundeffect = " + '"' + "$eventName" + '"' + "`n`taudio_event = " + '"' + "$eventName" + '"' + "`n}`n"
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
