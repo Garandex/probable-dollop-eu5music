@@ -1058,7 +1058,7 @@ foreach ($track in $Tracks) {
         $EventHash = [WwiseHasher]::Calculate($eventName)
         
         # Build the sb_music_logic entry mapping the true Event ID back to the string name
-        $LogicContent += "Event`t$EventHash`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
+        $LogicContent += "`t$EventHash`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
