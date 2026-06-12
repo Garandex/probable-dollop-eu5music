@@ -960,13 +960,17 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
-# Simple function to compute standard Wwise FNV-1a 32-bit hashes for Event Names
+# Simple function to compute standard Wwise FNV-1 32-bit hashes using safe native math
 function Get-WwiseHash([string]$String) {
-    $hash = 2166136261
+    # Force unsigned 32-bit types using .NET structures to prevent overflow crashes
+    [uint32]$hash = 2166136261
+    [uint32]$prime = 16777619
+    
     $bytes = [System.Text.Encoding]::ASCII.GetBytes($String.ToLower())
     foreach ($b in $bytes) {
-        $hash = $hash -bxor $b
-        $hash = ($hash * 16777619) -band 0xFFFFFFFF
+        # Using [unchecked] math operations ensures overflows wrap around naturally without errors
+        $hash = [unchecked]($hash -bxor $b)
+        $hash = [unchecked]($hash * $prime)
     }
     return $hash
 }
@@ -1046,7 +1050,7 @@ foreach ($track in $Tracks) {
         $EventHash = Get-WwiseHash $eventName
         
         # Build the sb_music_logic entry mapping the true Event ID back to the string name
-        $LogicContent += "Event`t$EventHash`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
+        $LogicContent += "`t$EventHash`t$eventName`t`t`t\ev_music\track picker\Orchestral\$eventName`n"
         
         $TotalRegistered++
     }
