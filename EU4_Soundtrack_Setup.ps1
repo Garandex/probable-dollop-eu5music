@@ -960,22 +960,30 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
-# Simple function to compute standard Wwise FNV-1 32-bit hashes using safe native math
-function Get-WwiseHash([string]$String) {
-    # We use basic Int64 (long) which handles values up to 9 quintillion without exceptions
-    [int64]$hash = 2166136261
-    [int64]$prime = 16777619
-    
-    $bytes = [System.Text.Encoding]::ASCII.GetBytes($String.ToLower())
-    foreach ($b in $bytes) {
-        # Using explicit .NET math operations prevents any automatic conversion to a float/decimal
-        $hash = $hash -bxor $b
-        $hash = [System.Math]::Multiply($hash, $prime)
-        
-        # Apply the bitmask to keep it strictly under the 32-bit limit
-        $hash = $hash -and 0xFFFFFFFF
+# Compile a native C# helper once to handle strict, silent 32-bit FNV-1a overflow math
+if (-not ([System.Management.Automation.PSTypeName]'WwiseHasher').Type) {
+    Add-Type -TypeDefinition @"
+    public static class WwiseHasher {
+        public static uint Calculate(string input) {
+            uint hash = 2166136261;
+            uint prime = 16777619;
+            byte[] bytes = System.Text.Encoding.ASCII.GetBytes(input.ToLower());
+            
+            foreach (byte b in bytes) {
+                unchecked {
+                    hash ^= b;
+                    hash *= prime;
+                }
+            }
+            return hash;
+        }
     }
-    return [uint32]$hash
+"@
+}
+
+function Get-WwiseHash([string]$String) {
+    # Call the native C# compilation layer directly
+    return [WwiseHasher]::Calculate($String)
 }
 
 # Define our mod file paths
