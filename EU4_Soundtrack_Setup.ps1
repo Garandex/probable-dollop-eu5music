@@ -595,7 +595,7 @@ function Write-Ok($msg)     { Write-Host "[OK] $msg" -ForegroundColor Green }
 function Write-Warn($msg)   { Write-Host "[!]  $msg" -ForegroundColor Yellow }
 function Write-Err($msg)    { Write-Host "[X]  $msg" -ForegroundColor Red }
 
-#NEW FUNCTION
+#NEW FUNCTION----------------------------------------------
 function Get-CleanTrackName([string]$EventName) {
     # Remove the 'MusicPlayer_eu4_' prefix
     $raw = $EventName -replace "^MusicPlayer_eu4_", ""
@@ -605,6 +605,40 @@ function Get-CleanTrackName([string]$EventName) {
     $textInfo = (Get-Culture).TextInfo
     return $textInfo.ToTitleCase($cleaned)
 }
+
+function Get-CleanDLCName([string]$EventName) {
+    # Check if the input is null or whitespace
+    if ([string]::IsNullOrWhiteSpace($EventName)) {
+        return "Base Europa Universalis IV Soundtrack"
+    }
+
+    # Remove the 'dlcXXX_' prefix
+    $raw = $EventName -replace "^dlc\d+_", ""
+    
+    # Replace underscores with spaces
+    $cleaned = $raw -replace "_", " "
+    
+    # Capitalize the first letter of each word
+    $textInfo = (Get-Culture).TextInfo
+    return $textInfo.ToTitleCase($cleaned)
+}
+
+function Get-CleanDLCID([string]$EventName) {
+    # Check if the input is null or whitespace
+    if ([string]::IsNullOrWhiteSpace($EventName)) {
+        return "eu4_main"
+    }
+
+    # Extract the 'dlcXXX' part at the start of the string
+    # We use a capture group (dlc\d+) to match the prefix
+    if ($EventName -match "^(dlc\d+)") {
+        return $Matches[1]
+    }
+
+    # Fallback if the input doesn't match the expected pattern
+    return "eu4_main"
+}
+# ----------------------------------------------------------
 
 function Get-WemId([string]$EventName) {
     [uint64]$h = 2166136261
@@ -927,13 +961,17 @@ New-Item -ItemType Directory -Force $MusicPlayerDir | Out-Null
 New-Item -ItemType Directory -Force $LocDir | Out-Null
 New-Item -ItemType Directory -Force $SoundLogicDir | Out-Null
 
-$TrackRegistryFile = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
-$LocalizationFile  = "$LocDir\eu4_music_l_english.yml"
-$MusicLogicFile    = "$SoundLogicDir\sb_music_logic.txt"
+$TrackRegistryFile   = "$MusicPlayerDir\01_eu4_imported_tracks.txt"
+$LocalizationFile    = "$LocDir\eu4_music_l_english.yml"
+$LocalizationDefFile = "$LocDir\eu4_music_defines_l_english.yml"
+$MusicLogicFile      = "$SoundLogicDir\sb_music_logic.txt"
 
 # 1. Initialize our files with headers
 $RegistryContent = "# Automated EU4 Imported Tracks Configuration`n"
 $LocContent      = "l_english:`n"
+$LocDefContent   = 'l_english:`n  EU4_Composer: "EU4 Theme"' + "`n"
+# Initialize a hash table to store unique DLCs
+$DlcMap = @{}
 
 # For sb_music_logic.txt, we must respect the standard Wwise tab-separated header format
 $LogicContent    = "Event`tID`tName`tWwise Object Path`n"
@@ -947,18 +985,27 @@ foreach ($track in $Tracks) {
     $eventName = $parts[0]
     $wemId     = Get-WemId $eventName
     $wemPath   = "$MediaDir\$wemId.wem"
+    #Now extract DLC for localisation
+    $dlcName   = $parts[2]
 
     # Only map tracks if the audio file exists
     if (Test-Path $wemPath) {
-        # Grab your beautiful hardcoded title from the 4th array position (Index 3)
+        # Grab your beautiful hardcoded title from the 1st array position (Index 0)
         $CleanName = Get-CleanTrackName $eventName
+        # Grab your beautiful hardcoded DLC from the 3rd array position (Index 2)
+        $CleanDLCName = Get-CleanDLCName $dlcName
+        # Grab your beautiful hardcoded DLC ID from the 3rd array position (Index 2)
+        $CleanDLCID = Get-CleanDLCID $dlcName
         
         # Build the metadata registry entry
-        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = Paradox_Interactive`n}`n"
+        $RegistryContent += "$eventName = {`n`tcomposer = EU4_Composer`n`tperformer = EU4DLC_$CleanDLCID`n}`n"
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
         $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`n"
+
+        # This automatically handles duplicates (the last one wins).
+        $DlcMap[$CleanDLCID] = $CleanDLCName
         
         # Build the sb_music_logic entry (Tab Separated values)
         # Format: Event [TAB] WemID [TAB] EventName [TAB] VirtualPath
@@ -968,12 +1015,29 @@ foreach ($track in $Tracks) {
     }
 }
 
+# Build the sorted localization file-------
+$LocDefContent = "l_english:`n  EU4_Composer: `"EU4 Theme`"`n"
+
+# A. Handle eu4_main first if it exists
+if ($DlcMap.ContainsKey("eu4_main")) {
+    $LocDefContent += "  EU4DLC_eu4_main: `"$($DlcMap["eu4_main"])`"`n"
+}
+
+# B. Sort the remaining keys and add them
+$SortedKeys = $DlcMap.Keys | Where-Object { $_ -ne "eu4_main" } | Sort-Object
+
+foreach ($Key in $SortedKeys) {
+    $LocDefContent += "  EU4DLC_$Key: `"$($DlcMap[$Key])`"`n"
+}
+# ------------------------------------------
+
 # 3. Write out the completed text files using proper encodings
 [System.IO.File]::WriteAllText($TrackRegistryFile, $RegistryContent, [System.Text.Encoding]::UTF8)
 
 # UTF-8 with BOM for Paradox Localization & Logic Engines
 $Utf8Bom = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText($LocalizationFile, $LocContent, $Utf8Bom)
+[System.IO.File]::WriteAllText($LocalizationDefFile, $LocDefContent, $Utf8Bom)
 [System.IO.File]::WriteAllText($MusicLogicFile, $LogicContent, $Utf8Bom)
 
 Write-Ok "Registered $TotalRegistered tracks and mapped Wwise logic successfully!"
