@@ -958,6 +958,7 @@ if ($done -gt 0 -and (Test-Path $MediaDir)) {
 }
 
 # --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
+# --- NEW: GENERATE EU5 MUSIC PLAYER TRACK & LOGIC DATA -----
 Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
 # Compile a native C# helper once to handle strict, silent 32-bit FNV-1a overflow math
@@ -979,11 +980,6 @@ if (-not ([System.Management.Automation.PSTypeName]'WwiseHasher').Type) {
         }
     }
 "@
-}
-
-function Get-WwiseHash([string]$String) {
-    # Call the native C# compilation layer directly
-    return [WwiseHasher]::Calculate($String)
 }
 
 # Define our mod file paths
@@ -1029,8 +1025,8 @@ foreach ($track in $Tracks) {
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
         $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`n"
         
-        # Calculate the true Wwise Event Hash from the string name using the fixed function
-        $EventHash = Get-WwiseHash $eventName
+        # FIX: Call the compiler layer helper directly here, bypassing the faulty math engine completely
+        $EventHash = [WwiseHasher]::Calculate($eventName)
         
         # Build the sb_music_logic entry mapping the true Event ID back to the string name
         $LogicContent += "Event`t$EventHash`t$eventName`t\ev_music\track picker\Orchestral\$eventName`n"
