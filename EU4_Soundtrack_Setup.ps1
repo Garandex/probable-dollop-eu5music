@@ -962,18 +962,18 @@ Write-Status "Generating EU5 Music Player configurations and sound mapping..."
 
 # Simple function to compute standard Wwise FNV-1 32-bit hashes using safe native math
 function Get-WwiseHash([string]$String) {
-    # Initialize using native 64-bit integers to hold the massive numbers during calculation
-    [uint64]$hash = 2166136261
-    [uint64]$prime = 16777619
+    # We use basic Int64 (long) which handles values up to 9 quintillion without exceptions
+    [int64]$hash = 2166136261
+    [int64]$prime = 16777619
     
     $bytes = [System.Text.Encoding]::ASCII.GetBytes($String.ToLower())
     foreach ($b in $bytes) {
+        # Using explicit .NET math operations prevents any automatic conversion to a float/decimal
         $hash = $hash -bxor $b
-        $hash = $hash * $prime
+        $hash = [System.Math]::Multiply($hash, $prime)
         
-        # This is the magic bitmask: It mimics a 32-bit rollover overflow 
-        # by instantly discarding any bits that exceed the 32-bit boundary.
-        $hash = $hash -band 0xFFFFFFFF
+        # Apply the bitmask to keep it strictly under the 32-bit limit
+        $hash = $hash -and 0xFFFFFFFF
     }
     return [uint32]$hash
 }
