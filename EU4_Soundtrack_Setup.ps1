@@ -1002,7 +1002,7 @@ foreach ($track in $Tracks) {
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
-        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`n"
+        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV."' + "`nThis track was used in $CleanDLCName.`n"
 
         # This automatically handles duplicates (the last one wins).
         $DlcMap[$CleanDLCID] = $CleanDLCName
