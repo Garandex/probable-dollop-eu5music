@@ -1005,12 +1005,12 @@ foreach ($track in $Tracks) {
         # logic for dealing with DLC names
         $displayName = $CleanDLCName
         
-        # 2. Add "the" if it isn't already there (only if it's NOT the main game)
+        # 2. Add "the" if it doesn't already have it
         if ($displayName -notlike "the *") {
             $displayName = "the $displayName"
         }
         
-        # 3. Add " DLC" suffix, unless it's the main game
+        # 3. Add " DLC" suffix ONLY if it is not the main game
         if ($CleanDLCID -ne "eu4_main") {
             $displayName += " DLC"
         }
