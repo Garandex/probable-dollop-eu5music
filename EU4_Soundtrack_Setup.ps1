@@ -611,6 +611,7 @@ function Get-CleanDLCName([string]$EventName) {
     if ([string]::IsNullOrWhiteSpace($EventName)) {
         return "Base Europa Universalis IV Soundtrack"
     }
+
     # Remove the 'dlcXXX_' prefix
     $raw = $EventName -replace "^dlc\d+_", ""
     
@@ -619,12 +620,15 @@ function Get-CleanDLCName([string]$EventName) {
     
     # Capitalize the first letter of each word
     $textInfo = (Get-Culture).TextInfo
+    
+    # Use -eq for comparison, NOT =
     if ($EventName -eq "10Th Anniversary") {
         return "10th Anniversary Community Music Pack"
     }
     if ($EventName -eq "Republican Music") {
         return "Republican Music Pack"
     }
+    
     return $textInfo.ToTitleCase($cleaned)
 }
 
