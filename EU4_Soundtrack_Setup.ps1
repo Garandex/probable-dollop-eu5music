@@ -611,7 +611,6 @@ function Get-CleanDLCName([string]$EventName) {
     if ([string]::IsNullOrWhiteSpace($EventName)) {
         return "Base Europa Universalis IV Soundtrack"
     }
-
     # Remove the 'dlcXXX_' prefix
     $raw = $EventName -replace "^dlc\d+_", ""
     
@@ -1002,8 +1001,24 @@ foreach ($track in $Tracks) {
         
         # Build the localization strings
         $LocContent += '  ' + $eventName + ': "' + $CleanName + '"' + "`n"
-        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV. This track was used in ' + "$CleanDLCName." + '"' + "`n"
 
+        # logic for dealing with DLC names
+        # Determine the display name based on whether it starts with "the"
+        if ($CleanDLCName -like "the *") {
+            $displayName = $CleanDLCName
+        } else {
+            $displayName = "the $CleanDLCName"
+        }
+        
+        # Apply the specific exception for eu4_main
+        if ($CleanDLCID -eq "eu4_main") {
+            $displayName = $CleanDLCName
+        } else {
+            $displayName = "$CleanDLCName DLC"
+        }
+        # Append to the LocContent string
+        $LocContent += '  ' + $eventName + '_flavour: "Classic track imported from Europa Universalis IV. This track was used in ' + $displayName + '."' + "`n"
+        
         # This automatically handles duplicates (the last one wins).
         $DlcMap[$CleanDLCID] = $CleanDLCName
         
